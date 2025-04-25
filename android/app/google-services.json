@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1004452497562",
+    "project_id": "thyecommercemobileapp",
+    "storage_bucket": "thyecommercemobileapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004452497562:android:28951b632b61612ec4f723",
+        "android_client_info": {
+          "package_name": "com.example.thyecommercemobileapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNTo-8x3Wk3BQimWrU5hEga6Kcr4YnC0Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
