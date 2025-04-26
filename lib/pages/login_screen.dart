@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/components/mybutton.dart';
 import 'package:thyecommercemobileapp/pages/singup_screen.dart';
+import 'package:thyecommercemobileapp/services/auth_gate.dart';
 import 'package:thyecommercemobileapp/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,10 +45,20 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Logged in as Admin succesfully')));
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AuthGate()),
+      );
     } else if (result == "User") {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Logged in Succefully!')));
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AuthGate()),
+      );
     } else {
       ScaffoldMessenger.of(
         context,

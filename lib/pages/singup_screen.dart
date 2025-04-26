@@ -108,7 +108,6 @@ class _signUpScreenState extends State<SingupScreen> {
                 SizedBox(height: 15),
                 TextField(
                   controller: _nameController,
-                  obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Name',
                     border: OutlineInputBorder(
@@ -143,9 +142,8 @@ class _signUpScreenState extends State<SingupScreen> {
                 ),
                 SizedBox(height: 30),
                 isLoading
-                    ? Mybutton(text: 'Sign Up', onTap: signUp)
-                    : Center(child: CircularProgressIndicator()),
-
+                    ? Center(child: CircularProgressIndicator())
+                    : Mybutton(text: "Sign Up ", onTap: signUp),
                 SizedBox(height: 15),
 
                 Row(
