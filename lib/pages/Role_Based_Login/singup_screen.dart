@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/components/mybutton.dart';
-import 'package:thyecommercemobileapp/pages/login_screen.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/login_screen.dart';
 import 'package:thyecommercemobileapp/services/auth_service.dart';
 
 class SingupScreen extends StatefulWidget {

@@ -1,0 +1,158 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/Admin/models/add_items_model.dart';
+import 'package:image_picker/image_picker.dart';
+
+class AddItemNotifier extends StateNotifier<AddItemsModel> {
+  AddItemNotifier() : super(AddItemsModel());
+
+  // lets first create a collection in our firestore database to store the itmes
+
+  CollectionReference items = FirebaseFirestore.instance.collection('items');
+  CollectionReference categories = FirebaseFirestore.instance.collection(
+    'Category',
+  );
+
+  // for picking an image
+
+  void pickImage() async {
+    try {
+      final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+      );
+      if (pickedFile != null) {
+        state = state.copyWith(iamgePath: pickedFile.path);
+      }
+    } catch (e) {
+      throw Exception('failed picking image:$e');
+    }
+  }
+
+  // set the selected category
+  void set(String selectedCategory) {
+    state = state.copyWith(selectedCategory: selectedCategory);
+  }
+
+  //for adding and removing size
+
+  void addSize(String size) {
+    state = state.copyWith(availableSize: [...state.availableSize!, size]);
+  }
+
+  // for removing an availbale size
+
+  void removeSize(String size) {
+    state = state.copyWith(
+      availableSize: state.availableSize!.where((s) => s != size).toList(),
+    );
+  }
+
+  // for adding a color for the item
+
+  void addColor(String color) {
+    state = state.copyWith(availableColors: [...state.availableColors!, color]);
+  }
+
+  // for removing the color
+  void removeColor(String color) {
+    state = state.copyWith(
+      availableColors: state.availableColors!.where((c) => c != color).toList(),
+    );
+  }
+
+  // for toggline either there is a discount or not
+
+  void toggleDiscount(bool? isDiscounted) {
+    state = state.copyWith(isDiscounted: isDiscounted);
+  }
+
+  // for setting the percentage discount
+
+  void setPercentageDiscount(String dicount) {
+    state = state.copyWith(discountPercentage: dicount);
+  }
+
+  // fetching the categories
+
+  Future<void> fetchingCategories() async {
+    try {
+      // fist get the snaphshot  of the collection from firestore
+
+      QuerySnapshot snapshot = await categories.get();
+
+      List<String> fetchedCategories =
+          snapshot.docs.map((item) => item['name'] as String).toList();
+      // now update the state by adding the fecthedCategories
+      state = state.copyWith(categories: fetchedCategories);
+    } catch (e) {
+      throw Exception('failed to fectch category $e');
+    }
+  }
+
+  // save and upload all itmes to firebase storage
+
+  Future<void> saveAndUploadItems(String price, String name) async {
+    // fist check whether all the fields are not null or not
+
+    if (price.isEmpty ||
+        name.isEmpty ||
+        state.availableColors == null ||
+        state.availableSize == null ||
+        state.iamgePath == null ||
+        state.isDiscounted && state.discountPercentage == null ||
+        state.selectedCategory == null) {
+      throw Exception('please fill all the inputs and try again');
+    }
+
+    // if all of the inputs required then start uploading the items to firebase
+
+    // sicne we are starting to upload make isLoading true
+
+    state = state.copyWith(isLoading: true);
+    try {
+      // first uploadt the image
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final reference = FirebaseStorage.instance.ref().child('image/$fileName');
+      await reference.putFile(File(state.iamgePath!));
+
+      // get the image url
+
+      final imageUrl = await reference.getDownloadURL();
+
+      // savae the items to the item collection on firestore
+
+      // first get the uid of the current user to know who upload the item
+
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+
+      await items.add({
+        'name': name,
+        'price': int.tryParse(price),
+        'sizes': state.availableSize,
+        'colors': state.availableColors,
+        'image': imageUrl,
+        'category': state.selectedCategory,
+        'uploadedBy': uid,
+        'isDiscounted': state.isDiscounted,
+        'discountPercentage':
+            state.isDiscounted ? int.tryParse(state.discountPercentage!) : 0,
+      });
+      // reset the current state after uploading
+      state = AddItemsModel();
+    } catch (e) {
+      throw Exception('failed to save the item $e');
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+}
+
+final addItemProvider = StateNotifierProvider<AddItemNotifier, AddItemsModel>((
+  ref,
+) {
+  return AddItemNotifier();
+});

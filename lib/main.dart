@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:thyecommercemobileapp/pages/login_screen.dart';
-import 'package:thyecommercemobileapp/pages/singup_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/login_screen.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/singup_screen.dart';
 import 'package:thyecommercemobileapp/services/auth_gate.dart';
 import 'firebase_options.dart';
 
@@ -20,6 +21,7 @@ ThemeData theme = ThemeData(
     onSurface: Colors.white, // Text/icon color on surface
   ),
 );
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -32,9 +34,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(body: AuthGate()),
+    return ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(body: AuthGate()),
+      ),
     );
   }
 }

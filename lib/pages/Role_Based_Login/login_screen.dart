@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/components/mybutton.dart';
-import 'package:thyecommercemobileapp/pages/singup_screen.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/singup_screen.dart';
 import 'package:thyecommercemobileapp/services/auth_gate.dart';
 import 'package:thyecommercemobileapp/services/auth_service.dart';
 
