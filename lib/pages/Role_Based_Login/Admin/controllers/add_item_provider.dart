@@ -32,8 +32,8 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
     }
   }
 
-  // set the selected category
-  void set(String selectedCategory) {
+  // setSelectedCategory the selected category
+  void setSelectedCategory(String selectedCategory) {
     state = state.copyWith(selectedCategory: selectedCategory);
   }
 
@@ -70,9 +70,9 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
     state = state.copyWith(isDiscounted: isDiscounted);
   }
 
-  // for setting the percentage discount
+  // for setSelectedCategoryting the percentage discount
 
-  void setPercentageDiscount(String dicount) {
+  void setDiscountPercentage(String dicount) {
     state = state.copyWith(discountPercentage: dicount);
   }
 
@@ -81,11 +81,13 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
   Future<void> fetchingCategories() async {
     try {
       // fist get the snaphshot  of the collection from firestore
-
+      print('fetching categories...');
       QuerySnapshot snapshot = await categories.get();
 
       List<String> fetchedCategories =
           snapshot.docs.map((item) => item['name'] as String).toList();
+      print('fetched categories: $fetchedCategories');
+      ;
       // now update the state by adding the fecthedCategories
       state = state.copyWith(categories: fetchedCategories);
     } catch (e) {
@@ -141,7 +143,7 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
         'discountPercentage':
             state.isDiscounted ? int.tryParse(state.discountPercentage!) : 0,
       });
-      // reset the current state after uploading
+      // resetSelectedCategory the current state after uploading
       state = AddItemsModel();
     } catch (e) {
       throw Exception('failed to save the item $e');

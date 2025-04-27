@@ -23,6 +23,5 @@ class MyTextfield extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }
