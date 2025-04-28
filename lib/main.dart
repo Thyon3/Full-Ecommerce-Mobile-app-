@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/login_screen.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/singup_screen.dart';
 import 'package:thyecommercemobileapp/services/auth_gate.dart';
 import 'firebase_options.dart';
 

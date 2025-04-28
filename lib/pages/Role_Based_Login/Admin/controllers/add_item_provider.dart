@@ -107,7 +107,9 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
         state.iamgePath == null ||
         state.isDiscounted && state.discountPercentage == null ||
         state.selectedCategory == null) {
-      throw Exception('please fill all the inputs and try again');
+      throw Exception(
+        'please fill all the inputs and try again${state.availableSize}${name + price}${state.availableColors}${state.iamgePath}${state.isDiscounted}${state.selectedCategory}${state.discountPercentage}',
+      );
     }
 
     // if all of the inputs required then start uploading the items to firebase

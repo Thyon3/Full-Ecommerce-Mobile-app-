@@ -210,7 +210,9 @@ class _AddItemsState extends ConsumerState<AddItems> {
                           ),
                         ),
                       ),
-                      onSubmitted: notifier.setDiscountPercentage,
+                      onSubmitted: (value) {
+                        notifier.setDiscountPercentage(value);
+                      },
                     ),
                   ],
                 ),
@@ -220,6 +222,10 @@ class _AddItemsState extends ConsumerState<AddItems> {
                   : MyElevatedButton(
                     onTap: () async {
                       try {
+                        notifier.setDiscountPercentage(
+                          _discountController.text,
+                        );
+
                         await notifier.saveAndUploadItems(
                           _priceController.text,
                           _nameController.text,
