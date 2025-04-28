@@ -1,5 +1,7 @@
+import 'dart:io';
+
 class AddItemsModel {
-  final String? iamgePath;
+  final File? iamgePath;
   final String? name;
   final List<String>? availableSize;
   final List<String>? availableColors;
@@ -22,7 +24,7 @@ class AddItemsModel {
   });
 
   AddItemsModel copyWith({
-    final String? iamgePath,
+    final File? iamgePath,
     final String? name,
     final List<String>? availableSize,
     final List<String>? availableColors,

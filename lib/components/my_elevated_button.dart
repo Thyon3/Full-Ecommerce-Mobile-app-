@@ -16,7 +16,7 @@ class MyElevatedButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
         backgroundColor: color,
       ),
       child: Text(
@@ -24,6 +24,7 @@ class MyElevatedButton extends StatelessWidget {
         style: GoogleFonts.lato(
           textStyle: TextStyle(
             color: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),

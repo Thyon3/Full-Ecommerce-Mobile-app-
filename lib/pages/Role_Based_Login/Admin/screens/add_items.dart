@@ -66,7 +66,7 @@ class _AddItemsState extends ConsumerState<AddItems> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Image.file(
-                                File(state.iamgePath!),
+                                state.iamgePath!,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -216,29 +216,32 @@ class _AddItemsState extends ConsumerState<AddItems> {
                     ),
                   ],
                 ),
-              SizedBox(height: 10),
-              state.isLoading
-                  ? CircularProgressIndicator()
-                  : MyElevatedButton(
-                    onTap: () async {
-                      try {
-                        notifier.setDiscountPercentage(
-                          _discountController.text,
-                        );
+              SizedBox(height: 25),
+              Center(
+                child:
+                    state.isLoading
+                        ? CircularProgressIndicator()
+                        : MyElevatedButton(
+                          onTap: () async {
+                            try {
+                              notifier.setDiscountPercentage(
+                                _discountController.text,
+                              );
 
-                        await notifier.saveAndUploadItems(
-                          _priceController.text,
-                          _nameController.text,
-                        );
-                        showSnackbar(context, 'Item saved succefully!');
-                        Navigator.pop(context);
-                      } catch (e) {
-                        showSnackbar(context, 'Error Saving the Item$e');
-                      }
-                    },
-                    buttonText: 'Save Item',
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                              await notifier.saveAndUploadItems(
+                                _priceController.text,
+                                _nameController.text,
+                              );
+                              showSnackbar(context, 'Item saved succefully!');
+                              Navigator.pop(context);
+                            } catch (e) {
+                              showSnackbar(context, 'Error Saving the Item$e');
+                            }
+                          },
+                          buttonText: 'Save Item',
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+              ),
             ],
           ),
         ),

@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/Admin/models/add_items_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddItemNotifier extends StateNotifier<AddItemsModel> {
   AddItemNotifier() : super(AddItemsModel());
@@ -25,7 +25,7 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
         source: ImageSource.gallery,
       );
       if (pickedFile != null) {
-        state = state.copyWith(iamgePath: pickedFile.path);
+        state = state.copyWith(iamgePath: File(pickedFile.path));
       }
     } catch (e) {
       throw Exception('failed picking image:$e');
@@ -81,18 +81,32 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
   Future<void> fetchingCategories() async {
     try {
       // fist get the snaphshot  of the collection from firestore
-      print('fetching categories...');
       QuerySnapshot snapshot = await categories.get();
 
       List<String> fetchedCategories =
           snapshot.docs.map((item) => item['name'] as String).toList();
-      print('fetched categories: $fetchedCategories');
-      ;
       // now update the state by adding the fecthedCategories
       state = state.copyWith(categories: fetchedCategories);
     } catch (e) {
       throw Exception('failed to fectch category $e');
     }
+  }
+
+  // upload images to supabase and return the public URL
+  Future<String> uploadImageToSupabase(File imageFile) async {
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final bucket = Supabase.instance.client.storage.from('product-images');
+
+    final response = await bucket.upload('images/$fileName.jpg', imageFile);
+
+    if (response.isEmpty) {
+      throw Exception('Failed to upload image');
+    }
+
+    // Get the public URL
+    final publicURL = bucket.getPublicUrl('images/$fileName.jpg');
+
+    return publicURL;
   }
 
   // save and upload all itmes to firebase storage
@@ -118,18 +132,27 @@ class AddItemNotifier extends StateNotifier<AddItemsModel> {
 
     state = state.copyWith(isLoading: true);
     try {
-      // first uploadt the image
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final reference = FirebaseStorage.instance.ref().child('image/$fileName');
-      await reference.putFile(File(state.iamgePath!));
+      // first upload the image
+      // final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      // final reference = FirebaseStorage.instance.ref().child(
+      //   'images/$fileName',
+      // );
 
-      // get the image url
+      // print('image path: ${state.iamgePath}');
+      // final uploadTask = await reference.putFile(File(state.iamgePath!));
 
-      final imageUrl = await reference.getDownloadURL();
+      // // Wait for upload to complete properly
+      // if (uploadTask.state != TaskState.success) {
+      //   throw Exception('Image upload failed.');
+      // }
+
+      // get the image url if the upload is succesfull.
+
+      // final imageUrl = await reference.getDownloadURL();
 
       // savae the items to the item collection on firestore
-
-      // first get the uid of the current user to know who upload the item
+      final image = state.iamgePath;
+      final imageUrl = await uploadImageToSupabase(image!);
 
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
