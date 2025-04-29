@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/Admin/screens/admin_home_screen.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/user_home_screen.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/homepage.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/app_home_screen.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/login_screen.dart';
 
 class AuthGate extends StatefulWidget {
@@ -63,6 +62,6 @@ class _AuthGateState extends State<AuthGate> {
     }
     // to keep the user logged in
 
-    return _userRole == 'Admin' ? AdminHomeScreen() : UserHomeScreen();
+    return _userRole == 'Admin' ? AdminHomeScreen() : AppHomeScreen();
   }
 }
