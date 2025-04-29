@@ -2,26 +2,27 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/Admin/screens/add_items.dart';
 import 'package:thyecommercemobileapp/services/auth_service.dart';
 
-class AdminHomeScreen extends StatefulWidget {
+class AdminHomeScreen extends ConsumerStatefulWidget {
   const AdminHomeScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() {
+  ConsumerState<ConsumerStatefulWidget> createState() {
     return _AdminHomeScreenState();
   }
 }
 
-class _AdminHomeScreenState extends State<AdminHomeScreen> {
+class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
   final AuthService _authService = AuthService();
   final CollectionReference items = FirebaseFirestore.instance.collection(
     'items',
   );
-  String? selectedCategory;
-  List<String> categories = [];
+  String? _selectedCategory;
+  List<String> categoriesList = [];
   String uid = FirebaseAuth.instance.currentUser!.uid;
 
   Widget _buildActionButton(
@@ -61,6 +62,24 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     // Implement delete functionality
   }
 
+  // now lets fetch the categories collection from firebase
+  Future<void> fetchCategories() async {
+    final QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Category').get();
+    // lets map each categoires items' name field to a list
+    setState(() {
+      categoriesList =
+          snapshot.docs.map((doc) => doc['name'] as String).toList();
+    });
+  }
+
+  @override
+  void initState() {
+    // fetch the categories the fist time the app runs
+    fetchCategories();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,12 +100,55 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       ),
                     ),
                   ),
+                  SizedBox(width: 40),
+                  Stack(
+                    children: [
+                      Icon(Icons.receipt_long, size: 30),
+                      CircleAvatar(
+                        backgroundColor: Colors.red,
+                        radius: 10,
+                        child: Text(
+                          '0',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   Spacer(),
+
+                  DropdownButton(
+                    itemHeight: 50,
+                    icon: Icon(Icons.tune),
+                    value: _selectedCategory,
+                    items:
+                        categoriesList.map((category) {
+                          return DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    },
+                    selectedItemBuilder: (context) => [],
+                  ),
+
+                  SizedBox(width: 25),
                   GestureDetector(
                     onTap: () {
                       _authService.signOut();
                     },
-                    child: Icon(Icons.exit_to_app_outlined),
+                    child: Icon(
+                      Icons.exit_to_app_outlined,
+                      size: 25,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ],
               ),
@@ -95,7 +157,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   stream:
                       items
                           .where('uploadedBy', isEqualTo: uid)
-                          .where('category', isEqualTo: selectedCategory)
+                          .where('category', isEqualTo: _selectedCategory)
                           .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasError) {
