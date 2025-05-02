@@ -26,7 +26,8 @@ class AppModel {
 List<AppModel> fullModels = [
   AppModel(
     name: 'Oversized Fit Printed Mesh T-Shirt',
-    description: 'description',
+    description:
+        'Make a statement with this bold graphic tee featuring vibrant, fade-resistant prints. The premium cotton fabric ensures all-day comfort while the eye-catching design turns heads. Machine washable for easy care.',
     price: 100,
     category: 'Women',
     rating: 343,

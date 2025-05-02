@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/homescreen.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/user_profile.dart';
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});
@@ -19,7 +20,7 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
     HomeScreen(),
     const Center(child: Text('Search')),
     const Center(child: Text('notifications')),
-    const Center(child: Text('profile')),
+    UserProfile(),
   ];
 
   int _selectedBarIndex = 0;
