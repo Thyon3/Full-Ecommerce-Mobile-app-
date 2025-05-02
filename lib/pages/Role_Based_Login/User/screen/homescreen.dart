@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:thyecommercemobileapp/components/my_banner.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/item_models.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/widget/item_model_description.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/widget/my_banner.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/widget/item_models.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/app_model.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/category_model.dart';
 
@@ -39,21 +41,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Stack(
                       children: [
-                        Icon(
-                          Icons.shopping_bag,
-                          size: 35,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        Icon(Icons.shopping_bag, size: 40, color: Colors.black),
                         Positioned(
-                          top: -4,
+                          top: -3,
+                          left: -1,
                           child: Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.red,
                             ),
                             child: Text(
-                              '4',
+                              '4', //later we will make it dynamic based on teh number of orders recived
                               style: GoogleFonts.lato(
                                 textStyle: TextStyle(
                                   fontSize: 12,
@@ -186,14 +185,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Padding(
                       padding:
                           index == 0
-                              ? EdgeInsets.symmetric(horizontal: 10)
-                              : EdgeInsets.only(right: 30),
-                      child: InkWell(
-                        onTap: () {},
-                        child: ItemModels(
-                          ecommerceItem: ecommerceItem,
-                          size: size,
-                        ),
+                              ? EdgeInsets.only(left: 10, right: 20)
+                              : EdgeInsets.only(right: 20),
+                      child: Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return ItemDetails(appModel: ecommerceItem);
+                                  },
+                                ),
+                              );
+                            },
+                            child: ItemModels(
+                              ecommerceItem: ecommerceItem,
+                              size: size,
+                            ),
+                          ),
+
+                          SizedBox(height: 7),
+                        ],
                       ),
                     );
                   }),
