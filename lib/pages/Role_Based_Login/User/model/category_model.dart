@@ -11,3 +11,14 @@ final List<CategoryModel> categoriesList = [
   CategoryModel(name: 'Baby', imagePath: 'assets/Model/CategoryBaby.png'),
   CategoryModel(name: 'child', imagePath: 'assets/Model/girl.png'),
 ];
+
+// lets have a list to filter the category
+
+List<String> filterCategory = [
+  'Filter',
+  'Color',
+  'Brand',
+  'Price',
+  'Rating',
+  'Size',
+];

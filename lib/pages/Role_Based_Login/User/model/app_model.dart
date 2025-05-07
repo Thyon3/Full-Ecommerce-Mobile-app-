@@ -15,6 +15,7 @@ class AppModel {
     required this.price,
     required this.category,
     required this.rating,
+
     required this.review,
     required this.size,
     required this.isCheck,
@@ -39,7 +40,8 @@ List<AppModel> fullModels = [
   ),
   AppModel(
     name: 'Sony WF-1000XM5',
-    description: 'Industry-leading noise cancellation',
+    description:
+        'Industry-leading noise cancellation made by me and you know what the funny thing is yeah it is super cheap cheap like you any think you have neer seen ',
     price: 299.99,
     category: 'Electronics',
     rating: 1892,
@@ -75,12 +77,13 @@ List<AppModel> fullModels = [
   ),
   AppModel(
     name: 'Hermès Twilly Silk Scarf',
-    description: 'Hand-rolled edges, 100% silk',
+    description:
+        'Hand-rolled edges, 100% silk It is also so comfortable with any kind of weather you want to wear so enjoy your Hrmes Twilly Silk Scarf i am sure you will have a fun too much fun ',
     price: 165.00,
     category: 'Women',
     rating: 342,
     review: 587,
-    size: ['One Size'],
+    size: ['M', 'L', 'XXL'],
     isCheck: false,
     fcolor: [
       Colors.pink.shade300,
@@ -127,7 +130,8 @@ List<AppModel> fullModels = [
   ),
   AppModel(
     name: 'Lululemon Align High-Rise Pant',
-    description: 'Buttery-soft Nulu™ fabric with naked sensation',
+    description:
+        'Buttery-soft Nulu™ fabric with naked sensation by naked sensation i don not mean what you think ',
     price: 98.00,
     category: 'Women',
     rating: 3245,

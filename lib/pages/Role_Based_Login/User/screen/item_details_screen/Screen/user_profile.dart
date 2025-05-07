@@ -7,13 +7,15 @@ class UserProfile extends StatelessWidget {
   final firebasAuth = FirebaseAuth.instance;
   Widget build(context) {
     return Scaffold(
-      body: Container(
-        child: MyElevatedButton(
-          onTap: () {
-            firebasAuth.signOut();
-          },
-          buttonText: 'Logout',
-          color: Colors.black38,
+      body: Center(
+        child: Container(
+          child: MyElevatedButton(
+            onTap: () {
+              firebasAuth.signOut();
+            },
+            buttonText: 'Logout',
+            color: Colors.black38,
+          ),
         ),
       ),
     );
