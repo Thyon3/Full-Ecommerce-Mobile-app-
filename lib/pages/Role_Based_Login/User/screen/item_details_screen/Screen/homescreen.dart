@@ -20,10 +20,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // TODO: implement widget
-  // now we will catch the category collection which contains the name and the image of each category
-  CollectionReference cetegoriesListFirestore = FirebaseFirestore.instance
-      .collection('Category');
+
   Widget build(context) {
+    // now we will catch the category collection which contains the name and the image of each category
+    CollectionReference cetegoriesListFirestore = FirebaseFirestore.instance
+        .collection('Category');
+
+    CollectionReference itemsList = FirebaseFirestore.instance.collection(
+      'items',
+    );
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -121,16 +126,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         ) {
                           return InkWell(
                             onTap: () {
-                              // filter the list of the AppModel with the cateory selected
-                              final filteredItems =
-                                  fullModels
-                                      .where(
-                                        (item) =>
-                                            item.category.toLowerCase() ==
-                                            categoriesList[index].name
-                                                .toLowerCase(),
-                                      )
-                                      .toList();
+                              // // filter the list of the AppModel with the cateory selected
+                              // final filteredItems =
+                              //     fullModels
+                              //         .where(
+                              //           (item) =>
+                              //               item.category.toLowerCase() ==
+                              //               categoriesList[index].name
+                              //                   .toLowerCase(),
+                              //         )
+                              //         .toList();
 
                               // Now navagate to the screen where you can get the list of the items with
                               // the category selected. so i am passing the filtered list and th category name
@@ -140,8 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 MaterialPageRoute(
                                   builder:
                                       (context) => CategoryItems(
-                                        appModel: filteredItems,
-                                        category: categoriesList[index].name,
+                                        selectedCategory:
+                                            snapshots.data!.docs[index]['name'],
                                       ),
                                 ),
                               );
@@ -219,41 +224,59 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               SizedBox(height: 15),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(fullModels.length, (index) {
-                    final ecommerceItem = fullModels[index];
-                    return Padding(
-                      padding:
-                          index == 0
-                              ? EdgeInsets.only(left: 10, right: 20)
-                              : EdgeInsets.only(right: 20),
-                      child: Column(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ItemDetails(appModel: ecommerceItem);
-                                  },
-                                ),
-                              );
-                            },
-                            child: ItemModels(
-                              ecommerceItem: ecommerceItem,
-                              size: size,
-                            ),
-                          ),
+              StreamBuilder(
+                stream: itemsList.snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshots) {
+                  if (snapshots.hasData) {
+                    final doc = snapshots.data!.docs;
 
-                          SizedBox(height: 7),
-                        ],
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(doc.length, (index) {
+                          final ecommerceItem = doc[index];
+                          final item =
+                              ecommerceItem.data() as Map<String, dynamic>;
+                          return Padding(
+                            padding:
+                                index == 0
+                                    ? EdgeInsets.only(left: 10, right: 20)
+                                    : EdgeInsets.only(right: 20),
+                            child: Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return ItemDetails(appModel: item);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: ItemModels(
+                                    ecommerceItem: item,
+                                    size: size,
+                                  ),
+                                ),
+
+                                SizedBox(height: 7),
+                              ],
+                            ),
+                          );
+                        }),
                       ),
                     );
-                  }),
-                ),
+                  }
+                  if (snapshots.hasError) {
+                    return Center(child: Text('something went wrong'));
+                  }
+                  if (!snapshots.hasData) {
+                    return CircularProgressIndicator();
+                  }
+                  return CircularProgressIndicator();
+                },
               ),
             ],
           ),

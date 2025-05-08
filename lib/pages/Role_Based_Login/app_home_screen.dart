@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/homescreen.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/user_profile.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/homescreen.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/user_profile.dart';
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});

@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/app_model.dart';
 
 class ItemModels extends StatelessWidget {
-  final AppModel ecommerceItem;
+  final Map<String, dynamic> ecommerceItem;
   final Size size;
 
   const ItemModels({
@@ -26,7 +27,7 @@ class ItemModels extends StatelessWidget {
               color: const Color.fromARGB(255, 134, 155, 177),
               borderRadius: BorderRadius.circular(8),
               image: DecorationImage(
-                image: AssetImage(ecommerceItem.image),
+                image: CachedNetworkImageProvider(ecommerceItem['image']),
                 fit: BoxFit.cover,
               ),
             ),
@@ -73,39 +74,41 @@ class ItemModels extends StatelessWidget {
 
                           const SizedBox(width: 8),
 
-                          // Rating
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.blue,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                (ecommerceItem.rating / ecommerceItem.review)
-                                    .toStringAsFixed(2),
-                                style: GoogleFonts.lato(
-                                  textStyle: const TextStyle(
-                                    color: Colors.deepOrangeAccent,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '(${ecommerceItem.rating.toInt()})',
-                                style: GoogleFonts.lato(
-                                  textStyle: const TextStyle(
-                                    color: Colors.black45,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                          // // Rating
+                          // Row(
+                          //   children: [
+                          //     const Icon(
+                          //       Icons.star,
+                          //       color: Colors.blue,
+                          //       size: 20,
+                          //     ),
+                          //     const SizedBox(width: 4),
+                          //     Text(
+                          //       'hi',
+                          //       // (ecommerceItem['rating'] /
+                          //       //         ecommerceItem['review'])
+                          //       //     .toStringAsFixed(2),
+                          //       style: GoogleFonts.lato(
+                          //         textStyle: const TextStyle(
+                          //           color: Colors.deepOrangeAccent,
+                          //           fontWeight: FontWeight.w800,
+                          //           fontSize: 16,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //     const SizedBox(width: 4),
+                          //     Text(
+                          //       '(${ecommerceItem['rating'].toInt()})',
+                          //       style: GoogleFonts.lato(
+                          //         textStyle: const TextStyle(
+                          //           color: Colors.black45,
+                          //           fontWeight: FontWeight.w800,
+                          //           fontSize: 16,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                         ],
                       ),
                     ),
@@ -115,7 +118,7 @@ class ItemModels extends StatelessWidget {
 
                   // Product Name - Fully visible through scrolling
                   Text(
-                    ecommerceItem.name,
+                    ecommerceItem['name'],
                     style: GoogleFonts.lato(
                       textStyle: TextStyle(
                         fontSize: 24,
@@ -131,7 +134,7 @@ class ItemModels extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '\$${ecommerceItem.price.toStringAsFixed(2)}',
+                        '\$${ecommerceItem['price'].toStringAsFixed(2)}',
                         style: GoogleFonts.lato(
                           textStyle: const TextStyle(
                             fontSize: 22,
@@ -140,11 +143,11 @@ class ItemModels extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (ecommerceItem.isCheck)
+                      if (ecommerceItem['isDiscounted'])
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Text(
-                            '\$${(ecommerceItem.price + 200).toStringAsFixed(2)}',
+                            '\$${(ecommerceItem['price'] + 200).toStringAsFixed(2)}',
                             style: GoogleFonts.lato(
                               textStyle: const TextStyle(
                                 fontSize: 18,

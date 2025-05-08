@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,18 +8,48 @@ import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/app_mode
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/category_model.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/sub_category.dart';
 
-class CategoryItems extends StatelessWidget {
-  final List<AppModel> appModel;
-  final String category;
-  const CategoryItems({
-    super.key,
-    required this.appModel,
-    required this.category,
-  });
+class CategoryItems extends StatefulWidget {
+  // this screen accepts the name of the category selected and the items inside of that category in a list
+  // final List<AppModel> appModel;   now i don't need this i only need the selected category
+  final String selectedCategory;
+  const CategoryItems({super.key, required this.selectedCategory});
+
+  @override
+  State<CategoryItems> createState() => _CategoryItemsState();
+}
+
+class _CategoryItemsState extends State<CategoryItems> {
+  // lets have some declaration some empty lists we can use to filter the whole items
+
+  List<QueryDocumentSnapshot> allItems = [];
+  List<QueryDocumentSnapshot> filterdItems = [];
+
+  TextEditingController searchController = TextEditingController();
+  void onSearchChanged() {
+    // suggesting
+
+    String searchTerm = searchController.text.toLowerCase();
+    setState(() {
+      filterdItems =
+          allItems.where((item) {
+            final data = item.data() as Map<String, dynamic>;
+            final itemName = data['name'].toString().toLowerCase();
+            return itemName.contains(searchTerm);
+          }).toList();
+    });
+  }
+
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
+    CollectionReference itemsList = FirebaseFirestore.instance.collection(
+      'items',
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -37,8 +69,12 @@ class CategoryItems extends StatelessWidget {
                     child: SizedBox(
                       height: 46,
                       child: TextField(
+                        controller: searchController,
+                        onSubmitted: (context) {
+                          onSearchChanged();
+                        },
                         decoration: InputDecoration(
-                          hintText: "${category}'s Fashion",
+                          hintText: "${widget.selectedCategory}'s Fashion",
                           hintStyle: GoogleFonts.lato(
                             textStyle: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
@@ -179,7 +215,7 @@ class CategoryItems extends StatelessWidget {
 
             // now lets put the itmes in the selected category i mean their details in a two grid container
             SizedBox(height: 20),
-            appModel.isEmpty
+            filterdItems.isEmpty
                 ? Center(
                   child: Text(
                     'This category is empty ',
@@ -191,17 +227,28 @@ class CategoryItems extends StatelessWidget {
                     ),
                   ),
                 )
-                : Padding(
-                  padding: EdgeInsets.only(
-                    top: 25,
-                    bottom: 25,
-                    right: 15,
-                    left: 10,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        GridView.builder(
+                : Expanded(
+                  child: StreamBuilder(
+                    stream:
+                        itemsList
+                            .where(
+                              'category',
+                              isEqualTo: widget.selectedCategory,
+                            )
+                            .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshots) {
+                      if (snapshots.hasData) {
+                        final items = snapshots.data!.docs;
+                        if (allItems.isEmpty) {
+                          allItems = items;
+                          filterdItems = items;
+                        }
+                        if (filterdItems.isEmpty) {
+                          return Center(child: Text('No Items are found'));
+                        }
+
+                        return GridView.builder(
+                          padding: EdgeInsets.all(15),
                           shrinkWrap: true,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
@@ -210,8 +257,16 @@ class CategoryItems extends StatelessWidget {
                                 mainAxisSpacing: 100,
                                 crossAxisCount: 2,
                               ),
-                          itemCount: appModel.length,
+                          itemCount: filterdItems.length,
                           itemBuilder: (context, index) {
+                            final doc =
+                                filterdItems[index]; //this is the firestore document
+                            final item =
+                                doc.data()
+                                    as Map<
+                                      String,
+                                      dynamic
+                                    >; // and this one is a ready to use item
                             return Container(
                               margin: const EdgeInsets.only(bottom: 10),
                               child: Column(
@@ -230,10 +285,8 @@ class CategoryItems extends StatelessWidget {
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Image.asset(
-                                        appModel[index].image,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
+                                      child: CachedNetworkImage(
+                                        imageUrl: item['image'],
                                       ),
                                     ),
                                   ),
@@ -274,33 +327,33 @@ class CategoryItems extends StatelessWidget {
                                                     size: 16,
                                                   ),
                                                   const SizedBox(width: 4),
-                                                  Text(
-                                                    '${(appModel[index].rating / appModel[index].review).toStringAsFixed(1)}',
-                                                    style: GoogleFonts.lato(
-                                                      textStyle: const TextStyle(
-                                                        color:
-                                                            Colors
-                                                                .deepOrangeAccent,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
+                                                  // Text(
+                                                  //   '${(filterdItems[index]['rating'] / filterdItems[index]['review']).toStringAsFixed(1)}',
+                                                  //   style: GoogleFonts.lato(
+                                                  //     textStyle: const TextStyle(
+                                                  //       color:
+                                                  //           Colors
+                                                  //               .deepOrangeAccent,
+                                                  //       fontWeight:
+                                                  //           FontWeight.w800,
+                                                  //       fontSize: 14,
+                                                  //     ),
+                                                  //   ),
+                                                  // ),   we dont' have a rating and a review
                                                   const SizedBox(width: 4),
-                                                  Text(
-                                                    '(${appModel[index].rating.toInt()})',
-                                                    style: GoogleFonts.lato(
-                                                      textStyle:
-                                                          const TextStyle(
-                                                            color:
-                                                                Colors.black45,
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                            fontSize: 14,
-                                                          ),
-                                                    ),
-                                                  ),
+                                                  // Text(
+                                                  //   '(${filterdItems[index]['rating'].toInt()})',
+                                                  //   style: GoogleFonts.lato(
+                                                  //     textStyle:
+                                                  //         const TextStyle(
+                                                  //           color:
+                                                  //               Colors.black45,
+                                                  //           fontWeight:
+                                                  //               FontWeight.w800,
+                                                  //           fontSize: 14,
+                                                  //         ),
+                                                  //   ),
+                                                  // ),
                                                 ],
                                               ),
                                             ),
@@ -309,7 +362,7 @@ class CategoryItems extends StatelessWidget {
                                         const SizedBox(height: 8),
                                         // Product Name - Fixed word separation
                                         Text(
-                                          appModel[index].name.replaceAll(
+                                          item['name'].replaceAll(
                                             RegExp(r'([a-z])([A-Z])'),
                                             r'$1 $2',
                                           ), // Adds space between camelCase
@@ -333,7 +386,7 @@ class CategoryItems extends StatelessWidget {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              '\$${appModel[index].price.toStringAsFixed(2)}',
+                                              '\$${item['price'].toStringAsFixed(2)}',
                                               style: GoogleFonts.lato(
                                                 textStyle: const TextStyle(
                                                   fontSize: 18,
@@ -368,13 +421,13 @@ class CategoryItems extends StatelessWidget {
                                             ),
                                           ],
                                         ),
-                                        if (appModel[index].isCheck)
+                                        if (item['isDiscounted'])
                                           Padding(
                                             padding: const EdgeInsets.only(
                                               top: 4,
                                             ),
                                             child: Text(
-                                              '\$${(appModel[index].price + 200).toStringAsFixed(2)}',
+                                              '\$${(item['price'] + 200).toStringAsFixed(2)}',
                                               style: GoogleFonts.lato(
                                                 textStyle: const TextStyle(
                                                   fontSize: 14,
@@ -394,9 +447,13 @@ class CategoryItems extends StatelessWidget {
                               ),
                             );
                           },
-                        ),
-                      ],
-                    ),
+                        );
+                      }
+                      if (snapshots.hasError) {
+                        return Center(child: Text('Something went wroing '));
+                      }
+                      return CircularProgressIndicator();
+                    },
                   ),
                 ),
           ],
