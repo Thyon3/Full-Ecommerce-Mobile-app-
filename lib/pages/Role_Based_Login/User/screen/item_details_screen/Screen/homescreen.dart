@@ -262,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     );
                                   },
                                   child: ItemModels(
-                                    ecommerceItem: item,
+                                    ecommerceItem: ecommerceItem,
                                     size: size,
                                   ),
                                 ),

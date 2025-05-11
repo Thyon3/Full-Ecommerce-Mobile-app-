@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/app_model.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/favourite_provider.dart';
 
-class ItemModels extends StatelessWidget {
-  final Map<String, dynamic> ecommerceItem;
+class ItemModels extends ConsumerWidget {
+  final DocumentSnapshot ecommerceItem;
   final Size size;
 
   const ItemModels({
@@ -14,7 +17,10 @@ class ItemModels extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(
+      favouriteProvider,
+    ); // access the favourite provider
     return SizedBox(
       width: size.width * 0.6,
       child: Column(
@@ -31,14 +37,28 @@ class ItemModels extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            child: const Align(
+            child: Align(
               alignment: Alignment.topRight,
               child: Padding(
                 padding: EdgeInsets.all(12),
                 child: CircleAvatar(
                   radius: 25,
                   backgroundColor: Color.fromARGB(255, 250, 231, 231),
-                  child: Icon(Icons.star_outline, size: 30, color: Colors.red),
+                  child: InkWell(
+                    onTap: () {
+                      ref
+                          .read(favouriteProvider)
+                          .toggleFavourites(ecommerceItem);
+                    },
+                    child:
+                        ref.read(favouriteProvider).isExist(ecommerceItem)
+                            ? Icon(Icons.star, size: 30, color: Colors.red)
+                            : Icon(
+                              Icons.star_outline,
+                              size: 30,
+                              color: Colors.red,
+                            ),
+                  ),
                 ),
               ),
             ),
