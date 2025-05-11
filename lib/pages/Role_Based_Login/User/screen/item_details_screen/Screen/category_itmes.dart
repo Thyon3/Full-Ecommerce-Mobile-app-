@@ -260,13 +260,13 @@ class _CategoryItemsState extends State<CategoryItems> {
                           itemCount: filterdItems.length,
                           itemBuilder: (context, index) {
                             final doc =
-                                filterdItems[index]; //this is the firestore document
+                                filterdItems[index]; //getting the single item from the List<QueryDocumentSnapshot>                                 filterdItems[index]; //this is the firestore document
                             final item =
                                 doc.data()
                                     as Map<
                                       String,
                                       dynamic
-                                    >; // and this one is a ready to use item
+                                    >; // and now changing the QueryDocumentSnapshot type to Map<String,Dynamic> ready to use Map[String] = Dynamic
                             return Container(
                               margin: const EdgeInsets.only(bottom: 10),
                               child: Column(
@@ -305,18 +305,16 @@ class _CategoryItemsState extends State<CategoryItems> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Container(
-                                              child: Text(
-                                                'H&M',
-                                                style: GoogleFonts.lato(
-                                                  textStyle: const TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w900,
-                                                  ),
+                                            Text(
+                                              'H&M',
+                                              style: GoogleFonts.lato(
+                                                textStyle: const TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w900,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
                                               ),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                             SingleChildScrollView(
                                               child: Row(
@@ -452,6 +450,7 @@ class _CategoryItemsState extends State<CategoryItems> {
                       if (snapshots.hasError) {
                         return Center(child: Text('Something went wroing '));
                       }
+
                       return CircularProgressIndicator();
                     },
                   ),

@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
 
 class ItemDetails extends StatefulWidget {
-  final Map<String, dynamic> appModel;
+  final Map<String, dynamic> appModel; //accepting the
   ItemDetails({super.key, required this.appModel});
 
   @override
@@ -15,8 +15,8 @@ class ItemDetails extends StatefulWidget {
 }
 
 class _ItemDetailsState extends State<ItemDetails> {
-  int _selectedColorIndex = 1;
-  int _selectedSizeIndex = 1;
+  // int _selectedColorIndex = 1;
+  // int _selectedSizeIndex = 1;
   int currentIndex = 0;
 
   double _getFontSize(String sizeText) {

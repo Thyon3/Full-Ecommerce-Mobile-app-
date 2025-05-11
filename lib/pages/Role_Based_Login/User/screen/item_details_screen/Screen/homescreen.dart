@@ -22,13 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
   // TODO: implement widget
 
   Widget build(context) {
-    // now we will catch the category collection which contains the name and the image of each category
+    // now we will catch the category collection which contains the name and the image of each category which are uploaded by the admin
     CollectionReference cetegoriesListFirestore = FirebaseFirestore.instance
         .collection('Category');
 
     CollectionReference itemsList = FirebaseFirestore.instance.collection(
       'items',
-    );
+    ); //the colletction of the items uploded by the admin
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -118,12 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 stream: cetegoriesListFirestore.snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshots) {
                   if (snapshots.hasData) {
+                    final item = snapshots.data!.docs;
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: List.generate(snapshots.data!.docs.length, (
-                          index,
-                        ) {
+                        children: List.generate(item.length, (index) {
+                          final firstDoc = item[index];
                           return InkWell(
                             onTap: () {
                               // // filter the list of the AppModel with the cateory selected
@@ -145,8 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 MaterialPageRoute(
                                   builder:
                                       (context) => CategoryItems(
-                                        selectedCategory:
-                                            snapshots.data!.docs[index]['name'],
+                                        selectedCategory: firstDoc['name'],
                                       ),
                                 ),
                               );
@@ -184,6 +183,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         }),
+                      ),
+                    );
+                  }
+                  if (snapshots.hasError) {
+                    return Center(
+                      child: Text(
+                        'Something went wrong ... Please try again later',
                       ),
                     );
                   }
@@ -261,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
 
-                                SizedBox(height: 7),
+                                SizedBox(height: 25),
                               ],
                             ),
                           );
