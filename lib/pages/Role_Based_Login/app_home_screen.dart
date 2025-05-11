@@ -18,7 +18,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
   // lets have the list of pages we will show for our items of bottom navigation bar
   List pages = [
     HomeScreen(),
-    const Center(child: Text('Search')),
     const Center(child: Text('notifications')),
     UserProfile(),
   ];
@@ -43,10 +42,6 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home_rounded, size: 35),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search, size: 35),
-            label: 'Search',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notification_add_outlined, size: 35),
