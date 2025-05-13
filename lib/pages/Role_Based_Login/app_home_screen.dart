@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/homescreen.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/user_profile.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/user_activity/favourites_screen.dart';
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});
@@ -16,11 +17,7 @@ class AppHomeScreen extends StatefulWidget {
 class _AppHomeScreenState extends State<AppHomeScreen> {
   @override
   // lets have the list of pages we will show for our items of bottom navigation bar
-  List pages = [
-    HomeScreen(),
-    const Center(child: Text('notifications')),
-    UserProfile(),
-  ];
+  List pages = [HomeScreen(), FavouritesScreen(), UserProfile()];
 
   int _selectedBarIndex = 0;
   Widget build(BuildContext context) {
@@ -44,8 +41,8 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notification_add_outlined, size: 35),
-            label: 'notifications',
+            icon: Icon(Icons.favorite, size: 35, color: Colors.red),
+            label: 'favourites',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline, size: 35),

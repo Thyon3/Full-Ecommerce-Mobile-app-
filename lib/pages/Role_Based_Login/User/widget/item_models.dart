@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/app_model.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/favourite_provider.dart';
 
 class ItemModels extends ConsumerWidget {
@@ -18,9 +17,7 @@ class ItemModels extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(
-      favouriteProvider,
-    ); // access the favourite provider
+    // access the favourite provider
     return SizedBox(
       width: size.width * 0.6,
       child: Column(
@@ -48,13 +45,17 @@ class ItemModels extends ConsumerWidget {
                     onTap: () {
                       ref
                           .read(favouriteProvider)
-                          .toggleFavourites(ecommerceItem);
+                          .toggleFavourite(ecommerceItem);
                     },
                     child:
                         ref.read(favouriteProvider).isExist(ecommerceItem)
-                            ? Icon(Icons.star, size: 30, color: Colors.red)
+                            ? Icon(
+                              Icons.favorite_outline,
+                              size: 30,
+                              color: Colors.red,
+                            )
                             : Icon(
-                              Icons.star_outline,
+                              Icons.favorite_outlined,
                               size: 30,
                               color: Colors.red,
                             ),

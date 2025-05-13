@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -8,98 +10,116 @@ final favouriteProvider = ChangeNotifierProvider<FavouriteProvider>((ref) {
 });
 
 class FavouriteProvider extends ChangeNotifier {
-  List<String> favouriteIds = [];
-  final _firestoreInstance = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<String> _favouriteIds = [];
+  StreamSubscription? _favouritesSubscription;
+  StreamSubscription? _authSubscription;
 
-  // lets have a getter for the favourites
-  List<String> get getFavourites {
-    return favouriteIds;
-  }
+  List<String> get favourites => _favouriteIds;
 
-  // reset all the favourites
-
-  void reset() {
-    favouriteIds = [];
-    notifyListeners();
-  }
-
-  // first get hte id of the current user
-
-  final userId = FirebaseAuth.instance.currentUser!.uid;
   FavouriteProvider() {
-    loadFavourites();
+    _setupAuthListener();
   }
 
-  // toggle favourites
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    _favouritesSubscription?.cancel();
+    super.dispose();
+  }
 
-  void toggleFavourites(DocumentSnapshot product) async {
-    final productId = product.id;
+  // Current user ID with null check
+  String get currentUserId {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('User not logged in');
+    return user.uid;
+  }
 
-    //  if the product is already favourite remove it and if not add it to the favourite list
-    if (favouriteIds.contains(productId)) {
-      favouriteIds.remove(productId);
+  // Set up auth state listener
+  void _setupAuthListener() {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) {
+        _subscribeToFavourites(user.uid);
+      } else {
+        _clearFavourites();
+      }
+    });
+  }
 
-      // now rmove the productID from firestore
-      await _removeFavouriteFromFirestore(productId);
-    } else {
-      (favouriteIds.add(productId));
-      //  now add the productId to firestore
-      await _addFavouriteToFirestore(productId);
-    }
+  // Subscribe to real-time favourites updates
+  void _subscribeToFavourites(String userId) {
+    _favouritesSubscription?.cancel();
+    _favouritesSubscription = _firestore
+        .collection('userFavourite')
+        .doc(userId)
+        .collection('favourites')
+        .snapshots()
+        .listen((snapshot) {
+          _favouriteIds = snapshot.docs.map((doc) => doc.id).toList();
+          notifyListeners();
+        }, onError: (e) => debugPrint('Favourites error: $e'));
+  }
 
+  // Clear favourites when user logs out
+  void _clearFavourites() {
+    _favouriteIds = [];
     notifyListeners();
   }
 
-  // check whether the item is favourite or not
+  // Toggle favourite status
+  Future<void> toggleFavourite(DocumentSnapshot product) async {
+    final productId = product.id;
+    try {
+      if (isFavourite(productId)) {
+        await _removeFavourite(productId);
+        _favouriteIds.remove(productId);
+      } else {
+        await _addFavourite(productId);
+        _favouriteIds.add(productId);
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Toggle favourite error: $e');
+      rethrow;
+    }
+  }
 
+  // Check if product is favourite
+  bool isFavourite(String productId) => _favouriteIds.contains(productId);
+
+  // Add to Firestore
+  Future<void> _addFavourite(String productId) async {
+    await _firestore
+        .collection('userFavourite')
+        .doc(currentUserId)
+        .collection('favourites')
+        .doc(productId)
+        .set({
+          'isFavourite': true,
+          'userId': currentUserId,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+  }
+
+  // Remove from Firestore
+  Future<void> _removeFavourite(String productId) async {
+    await _firestore
+        .collection('userFavourite')
+        .doc(currentUserId)
+        .collection('favourites')
+        .doc(productId)
+        .delete();
+  }
+
+  // Reset all favourites
+  void reset() {
+    _favouriteIds = [];
+    notifyListeners();
+  }
+
+  // check whether a product is a favourite or not
   bool isExist(DocumentSnapshot product) {
-    return favouriteIds.contains(product.id);
-  }
-  //  add the favourite list items to firestore
-
-  Future<void> _addFavouriteToFirestore(String ProductId) async {
-    try {
-      await _firestoreInstance.collection('userFavourite').doc(ProductId).set({
-        'isFavourite': true,
-        'UserId': userId,
-      });
-      notifyListeners();
-    } catch (e) {
-      throw e.toString();
-    }
-  }
-  // remove the favourite item from firestore
-
-  Future<void> _removeFavouriteFromFirestore(String ProductId) async {
-    try {
-      await _firestoreInstance
-          .collection('userFavourite')
-          .doc(ProductId)
-          .delete();
-      notifyListeners();
-    } catch (e) {
-      throw e.toString();
-    }
-  }
-
-  // loading the favourite items form firestore when the app first runs
-
-  Future<void> loadFavourites() async {
-    try {
-      QuerySnapshot snapshots =
-          await _firestoreInstance
-              .collection('userFavourite')
-              .where('UserId', isEqualTo: userId)
-              .get();
-
-      favouriteIds =
-          snapshots.docs.map((doc) {
-            return doc.id;
-          }).toList();
-
-      notifyListeners();
-    } catch (e) {
-      throw e.toString();
-    }
+    final productId = product.id;
+    return _favouriteIds.contains(productId);
   }
 }

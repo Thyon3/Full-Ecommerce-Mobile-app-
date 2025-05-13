@@ -32,6 +32,7 @@ class AuthService {
         "name": name.trim(),
         "email": email.trim(),
         "role": role,
+        "userId": FirebaseAuth.instance.currentUser!.uid,
       });
       return null; // if null is returned then sign up is succefull
     } catch (e) {
@@ -67,6 +68,7 @@ class AuthService {
   // sign out
 
   Future<void> signOut() async {
-    return await _auth.signOut();
+    await _auth.signOut();
+    await Future.delayed(Duration(seconds: 1)); // Wait for clean state
   }
 }
