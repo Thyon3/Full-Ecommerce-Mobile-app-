@@ -1,20 +1,26 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:thyecommercemobileapp/components/my_elevated_button.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/controller/cart_provider.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/app_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/user_activity/add_to_cart/screen/cart_screen.dart';
 
-class ItemDetails extends StatefulWidget {
+class ItemDetails extends ConsumerStatefulWidget {
   final Map<String, dynamic> appModel; //accepting the
-  ItemDetails({super.key, required this.appModel});
+
+  final DocumentSnapshot ecommerceItem;
+  ItemDetails({super.key, required this.appModel, required this.ecommerceItem});
 
   @override
-  State<ItemDetails> createState() => _ItemDetailsState();
+  ConsumerState<ItemDetails> createState() => _ItemDetailsState();
 }
 
-class _ItemDetailsState extends State<ItemDetails> {
+class _ItemDetailsState extends ConsumerState<ItemDetails> {
   // int _selectedColorIndex = 1;
   // int _selectedSizeIndex = 1;
   int currentIndex = 0;
@@ -320,7 +326,22 @@ class _ItemDetailsState extends State<ItemDetails> {
                 child: Row(
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        ref
+                            .read(cartProvider.notifier)
+                            .addToCart(
+                              widget.ecommerceItem.id,
+                              widget.ecommerceItem.data()
+                                  as Map<String, dynamic>,
+                              'black',
+                              'large',
+                            );
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CartScreen()),
+                        );
+                      },
                       icon: Icon(
                         Iconsax.shopping_cart,
                         color: Theme.of(context).colorScheme.onPrimary,

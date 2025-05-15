@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:thyecommercemobileapp/components/cart_item_counter.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/category_itmes.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/item_details.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/widget/item_model_description.dart';
@@ -48,32 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Icon(Icons.error);
                       },
                     ),
-                    Stack(
-                      children: [
-                        Icon(Icons.shopping_bag, size: 40, color: Colors.black),
-                        Positioned(
-                          top: -3,
-                          left: -1,
-                          child: Container(
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.red,
-                            ),
-                            child: Text(
-                              '4', //later we will make it dynamic based on teh number of orders recived
-                              style: GoogleFonts.lato(
-                                textStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    CartItemCounter(),
                   ],
                 ),
               ),
@@ -256,7 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return ItemDetails(appModel: item);
+                                          return ItemDetails(
+                                            appModel: item,
+                                            ecommerceItem: ecommerceItem,
+                                          );
                                         },
                                       ),
                                     );

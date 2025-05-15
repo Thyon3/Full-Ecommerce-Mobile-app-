@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/favourite_provider.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/controller/favourite_provider.dart';
 
 class ItemModels extends ConsumerWidget {
   final DocumentSnapshot ecommerceItem;
@@ -50,12 +50,12 @@ class ItemModels extends ConsumerWidget {
                     child:
                         ref.read(favouriteProvider).isExist(ecommerceItem)
                             ? Icon(
-                              Icons.favorite_outline,
+                              Icons.favorite_outlined,
                               size: 30,
                               color: Colors.red,
                             )
                             : Icon(
-                              Icons.favorite_outlined,
+                              Icons.favorite_outline,
                               size: 30,
                               color: Colors.red,
                             ),
