@@ -23,18 +23,34 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetCart() {
-    _cart = [];
-    notifyListeners();
-  }
-
   /*
   this does not update the userId as the user signs out and login again so use a getter 
   final userId = FirebaseAuth.instance.currentUser?.uid;
   */
 
   // so instead of finding directly the userId use a getter to return the userId
-  String? get getUserId => FirebaseAuth.instance.currentUser?.uid;
+  String? get getUserId {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return 'please login first';
+    }
+    return user.uid;
+  }
+
+  void resetCart() {
+    _cart = [];
+    notifyListeners();
+  }
+
+  // load the _cart on the consutructor
+
+  CartProvider() {
+    final userId = getUserId;
+    if (userId != null) {
+      loadCartItemsFromFirestore();
+    }
+  }
 
   // add to cart funciton
 
