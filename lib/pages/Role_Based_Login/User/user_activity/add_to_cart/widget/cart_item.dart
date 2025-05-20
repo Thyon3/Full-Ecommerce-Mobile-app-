@@ -1,20 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:thyecommercemobileapp/main.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/controller/cart_provider.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/cart_model.dart';
-import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/screen/item_details_screen/Screen/item_details.dart';
 
 class CartItem extends ConsumerWidget {
   const CartItem({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Size size = MediaQuery.of(context).size;
-
     // watch the cartProvider
     final cartState = ref.watch(cartProvider);
     final cart = cartState.getCart;

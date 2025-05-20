@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:thyecommercemobileapp/components/show_snackbar.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/model/cart_model.dart';
 import 'package:flutter/material.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/user_activity/add_to_cart/screen/my_orders.dart';
 
 final cartProvider = ChangeNotifierProvider<CartProvider>((ref) {
   return CartProvider();
@@ -216,5 +218,114 @@ class CartProvider extends ChangeNotifier {
           .delete();
     }
     notifyListeners();
+  }
+
+  // Save order to firestore
+
+  Future<void> saveOrders(
+    String? userId,
+    BuildContext context,
+    double finalPrice,
+    String paymentMethodId,
+    String address,
+  ) async {
+    try {
+      debugPrint('Starting order process...');
+      debugPrint('UserID: $userId');
+      debugPrint('PaymentMethodID: $paymentMethodId');
+      debugPrint('Cart items count: ${_cart.length}');
+
+      if (_cart.isEmpty) {
+        debugPrint('Cart is empty');
+        showSnackbar(context, 'Your cart is empty');
+        return;
+      }
+
+      final paymentRef = FirebaseFirestore.instance
+          .collection('UsersPaymentInformation')
+          .doc(userId)
+          .collection('PaymentDetail')
+          .doc(paymentMethodId);
+
+      debugPrint('Payment reference path: ${paymentRef.path}');
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        // 1. Verify payment method exists
+        final snapshot = await transaction.get(paymentRef);
+        debugPrint('Payment document exists: ${snapshot.exists}');
+
+        if (!snapshot.exists) {
+          debugPrint('Payment method not found');
+          throw Exception('Payment method not found');
+        }
+
+        final balanceData = snapshot.data();
+        debugPrint('Balance data: $balanceData');
+
+        if (balanceData == null || !balanceData.containsKey('balance')) {
+          debugPrint('Balance field missing');
+          throw Exception('Payment information incomplete');
+        }
+
+        final currentBalance = balanceData['balance'];
+        debugPrint('Current balance (raw): $currentBalance');
+
+        if (currentBalance is! num) {
+          debugPrint('Balance is not a number');
+          throw Exception('Invalid balance format');
+        }
+
+        final balanceValue = currentBalance.toDouble();
+        debugPrint('Current balance: $balanceValue');
+
+        if (balanceValue < finalPrice) {
+          debugPrint('Insufficient funds: $balanceValue < $finalPrice');
+          throw Exception('Insufficient funds');
+        }
+
+        final orderDocRef =
+            FirebaseFirestore.instance
+                .collection('UserOrders')
+                .doc(userId)
+                .collection('OrderDetail')
+                .doc();
+
+        final orderData = {
+          'userId': userId,
+          'createdAt': FieldValue.serverTimestamp(),
+          'status': 'pending',
+          'total': finalPrice,
+          'items':
+              _cart
+                  .map(
+                    (item) => {
+                      'productId': item.productId,
+                      'name': item.productData['name'],
+                      'quantity': item.quantity,
+                      'price': item.productData['price'],
+                    },
+                  )
+                  .toList(),
+        };
+
+        transaction.update(paymentRef, {
+          'balance': balanceValue - finalPrice,
+          'lastUsed': FieldValue.serverTimestamp(),
+        });
+
+        debugPrint('Creating order document...');
+        transaction.set(orderDocRef, orderData);
+
+        debugPrint('Transaction completed successfully');
+      });
+
+      debugPrint('Order processed successfully');
+      showSnackbar(context, 'Order placed successfully!');
+      resetCart();
+    } catch (e, stackTrace) {
+      debugPrint('Error in saveOrders: $e');
+      debugPrint('Stack trace: $stackTrace');
+      showSnackbar(context, 'Failed to place order: ${e.toString()}');
+    }
   }
 }

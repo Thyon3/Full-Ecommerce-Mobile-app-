@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thyecommercemobileapp/components/my_elevated_button.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/user_profile/Payment/add_payment.dart';
+import 'package:thyecommercemobileapp/pages/Role_Based_Login/User/user_profile/Payment/payment_screen.dart';
 import 'package:thyecommercemobileapp/pages/Role_Based_Login/login_screen.dart';
 
 class UserProfile extends StatelessWidget {
@@ -99,6 +101,14 @@ class UserProfile extends StatelessWidget {
                   ),
 
                   GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentScreen(),
+                        ),
+                      );
+                    },
                     child: ListTile(
                       leading: Icon(
                         Icons.payment,
